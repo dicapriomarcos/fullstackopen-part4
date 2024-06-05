@@ -14,11 +14,14 @@ const databaseName = process.env.NODE_ENV.trim() === 'test'
 
 const mongoUrl = `mongodb+srv://${user}:${password}@cluster0.hustame.mongodb.net/${databaseName}?retryWrites=true&w=majority`
 console.log(mongoUrl)
+
 mongoose.connect(mongoUrl)
+
 .then(result => {
   console.log('connected to MongoDB')
 })
 .catch(error => {
   console.log('error connecting to MongoDB:', error.message)
 })
+
 
