@@ -11,10 +11,21 @@ blogRouter.get('/', async (request, response) => {
 
 blogRouter.post('/', async (request, response) => {
 
-  const blog = new Blog(request.body)
+  const body = request.body
 
-  const newBlog = await blog.save()
-  response.status(201).json(newBlog)
+  if( !body.title || !body.url ){
+
+    response.status(400).end()
+
+  }else{
+
+    const blog = new Blog(body)
+    const newBlog = await blog.save()
+    response.status(201).json(newBlog) 
+
+  }
+
+
 
 })
 

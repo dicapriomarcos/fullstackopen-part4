@@ -1,4 +1,5 @@
 const express = require('express');
+require('express-async-errors')
 const cors = require('cors');
 const db = require('./db');
 const app = express();
@@ -19,6 +20,11 @@ morgan.token('postData', (request, response) => {
 });
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :postData'));
+
+app.use((err, req, res, next) => {
+    console.error(err); 
+    res.status(400).json({ error: 'Internal Server Error' });
+});
 
 // ROUTES
 app.use('/api/blogs', blogRouter);
