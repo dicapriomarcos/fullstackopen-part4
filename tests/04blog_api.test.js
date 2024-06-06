@@ -76,6 +76,47 @@ describe('save new blog', () => {
     })
 });
 
+test('delete a blog with ID', async () => {
+
+    const blogs = await api.get('/api/blogs');
+    const id = blogs.body[0].id;
+
+    await api.delete(`/api/blogs/${id}`)
+    .expect(204)
+  
+    const response = await api.get('/api/blogs');
+    assert.strictEqual(response.body.length, multipleBlogs.length - 1);
+});
+
+test('update likes of a blog', async () => {
+
+    const blogs = await api.get('/api/blogs')
+    const blog = blogs.body[0]
+    const id = blog.id
+
+    const olderLikes = blog.likes
+    const updatedBlog = blog
+    updatedBlog.likes + 1
+
+    await api.put(`/api/blogs/${id}`)
+    .send(updatedBlog)
+    .expect(200)
+
+    const newBlogs = await api.get('/api/blogs')
+    const newVersionBlog = newBlogs.body[0]
+
+    console.log(`The Old Version of Blog has ${olderLikes} likes`);
+    console.log(`The New Version of Blog has ${newVersionBlog.likes} likes`);
+
+    if(newVersionBlog.id === id){
+
+     assert.strictEqual(newVersionBlog.likes, olderLikes + 1);
+    
+    }else{
+        console.log('Blog ID is not same');
+    }
+});
+
 
 after(async () => {
 await mongoose.connection.close();
