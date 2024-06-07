@@ -5,7 +5,7 @@ const { describe, test, after, beforeEach } = require('node:test')
 const assert = require('node:assert');
 const supertest = require('supertest');
 const { multipleBlogs, uniqueBlog } = require('../utils/test_data')
-const Blog = require('../models/Blog');
+const Blog = require('../models/blog');
 const api = supertest(app);
 
 beforeEach(async () => {
@@ -18,7 +18,7 @@ beforeEach(async () => {
     const promiseArray = blogObjects.map(blog => blog.save())
     await Promise.all(promiseArray)
 
-  })
+})
 
 test('obtains blogs', async () => {
     await api.get('/api/blogs')
@@ -89,32 +89,21 @@ test('delete a blog with ID', async () => {
 });
 
 test('update likes of a blog', async () => {
+    const blogs = await api.get('/api/blogs');
+    const testBlog = blogs.body[0];
+    const id = testBlog.id;
 
-    const blogs = await api.get('/api/blogs')
-    const blog = blogs.body[0]
-    const id = blog.id
+    const olderLikes = testBlog.likes;
+    const updatedBlog = { ...testBlog, likes: olderLikes + 1 };
 
-    const olderLikes = blog.likes
-    const updatedBlog = blog
-    updatedBlog.likes + 1
-
-    await api.put(`/api/blogs/${id}`)
-    .send(updatedBlog)
-    .expect(200)
-
-    const newBlogs = await api.get('/api/blogs')
-    const newVersionBlog = newBlogs.body[0]
+    const addLikesToBlog = await api.put(`/api/blogs/${id}`)
+        .send(updatedBlog)
+        .expect(200);
 
     console.log(`The Old Version of Blog has ${olderLikes} likes`);
-    console.log(`The New Version of Blog has ${newVersionBlog.likes} likes`);
+    console.log(`The New Version of Blog has ${addLikesToBlog.body.likes} likes`);
 
-    if(newVersionBlog.id === id){
-
-     assert.strictEqual(newVersionBlog.likes, olderLikes + 1);
-    
-    }else{
-        console.log('Blog ID is not same');
-    }
+    assert.strictEqual(addLikesToBlog.body.likes, olderLikes + 1);
 });
 
 

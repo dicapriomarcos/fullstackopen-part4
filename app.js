@@ -4,6 +4,7 @@ const cors = require('cors');
 const db = require('./db');
 const app = express();
 const blogRouter = require('./controllers/blog');
+const userRouter = require('./controllers/user');
 
 app.use(cors());
 app.use(express.json());
@@ -28,5 +29,7 @@ app.use((err, req, res, next) => {
 
 // ROUTES
 app.use('/api/blogs', blogRouter);
+
+app.use('/api/users', userRouter);
 
 module.exports = app;

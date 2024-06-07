@@ -47,7 +47,35 @@ const uniqueBlog = [
     multipleBlogs[0]
 ]
 
+const MultipleUsers = [
+  {
+    username: "user1",
+    name: "user1 name",
+    password: "user1password"
+  },
+  {
+    username: "user2",
+    name: "user2 name",
+    password: "user2password"
+  },
+  {
+    username: "user3",
+    name: "user3 name",
+    password: "user3password"
+  }
+]
+
+const oneUser = [
+  {
+    username: "root",
+    name: "Root User",
+    password: "rootpassword"
+  }
+]
+
 module.exports = {
     multipleBlogs,
-    uniqueBlog
+    uniqueBlog,
+    MultipleUsers,
+    oneUser
 }

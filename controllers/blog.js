@@ -1,6 +1,5 @@
 const blogRouter = require('express').Router();
-const Blog = require('../models/Blog');
-
+const Blog = require('../models/blog');
 
 blogRouter.get('/', async (request, response) => {
 
@@ -42,8 +41,6 @@ blogRouter.put('/:id', async (request, response) => {
   const id = request.params.id
   const likes = request.body.likes
   const body = request.body
-
-  
 
   if(!likes){
     response.status(400).end()
