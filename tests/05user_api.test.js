@@ -36,6 +36,76 @@ test('create a new user', async () => {
     assert.strictEqual(allUsers.body.length, originalUsers.body.length + 1)
 })
 
+describe('users create tests', () => {
+
+    test('username is required', async () => {
+
+        const singleUser = oneUser
+        delete singleUser[0].username
+
+        await api.post('/api/users')
+        .send(singleUser[0])
+        .expect(400)
+
+    });
+
+    test('username not has 3 letters min', async () => {
+
+            const singleUser = oneUser
+            singleUser[0].username = 'ab'
+
+            await api.post('/api/users')
+            .send(singleUser[0])
+            .expect(400)
+
+    })
+
+    test('username with 3 letters min', async () => {
+
+        const singleUser = oneUser
+        singleUser[0].username = 'abc'
+
+        await api.post('/api/users')
+        .send(singleUser[0])
+        .expect(201)
+
+    })
+
+    test('password is required', async () => {
+
+        const singleUser = oneUser
+        delete singleUser[0].password
+
+        await api.post('/api/users')
+        .send(singleUser[0])
+        .expect(400)
+
+    });
+
+    test('password not has 3 letters min', async () => {
+
+            const singleUser = oneUser
+            singleUser[0].password = 'ab'
+
+            await api.post('/api/users')
+            .send(singleUser[0])
+            .expect(400)
+
+    })
+
+    test('password with 3 characters min', async () => {
+
+        const singleUser = oneUser
+        singleUser[0].password = 'abc'
+
+        await api.post('/api/users')
+        .send(singleUser[0])
+        .expect(201)
+
+    })
+
+})
+
 after(async () => {
     await mongoose.connection.close();
 });
