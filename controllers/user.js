@@ -10,48 +10,29 @@ userRouter.get('/', async (request, response) => {
 })
 
 // create user route
-{}
-userRouter.post('/', async (request, response) => {
+userRouter.post('/', async (request, response, next) => {
 
   const { username, name, password } = request.body
-
-  // Validation
-  const errorMessage = [];
-
-  if( !username ){
-    errorMessage.push('username is required')
-  }
-
-  if( !password){
-    errorMessage.push('password is required')
-  }
-
-  if( username && username.length < 3 ){
-    errorMessage.push('username must be at least 3 letters')
-  }
-
-  if( password && password.length < 3 ){
-    errorMessage.push('password must be at least 3 letters')
-  }
-
-  if( errorMessage && errorMessage.length > 0 ){
-    response.status(400).json({error: errorMessage.join(',')})
-  }
-
-  // Password
-  const saltRounds = 10
-  const passwordHash = await bcrypt.hash(password, saltRounds)
 
   const user = new User({
     username: username,
     name : name,
-    password: passwordHash,
+    password : ''
   })
 
-  const savedUser = await user.save()
+  // Password
+  if( password && password.length >= 3 ){
+      const saltRounds = 10
+      const passwordHash = await bcrypt.hash(password, saltRounds)
+      user.password = passwordHash
+  }
 
+  const savedUser = await user.save()
   response.status(201).json(savedUser)
   
 })
+
+
+
 
 module.exports = userRouter

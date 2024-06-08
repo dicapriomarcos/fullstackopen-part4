@@ -6,6 +6,7 @@ const assert = require('node:assert');
 const supertest = require('supertest');
 const { multipleBlogs, uniqueBlog } = require('../utils/test_data')
 const Blog = require('../models/blog');
+const { json } = require('express');
 const api = supertest(app);
 
 beforeEach(async () => {
@@ -41,7 +42,7 @@ describe('save new blog', () => {
 
     test('save a single blog', async () => {
 
-        const singleBlog = uniqueBlog;
+        const singleBlog = JSON.parse(JSON.stringify(uniqueBlog));
         singleBlog[0].title = 'Save a single blog';   
 
         await api.post('/api/blogs')
@@ -54,7 +55,7 @@ describe('save new blog', () => {
 
     test('save blog with likes default 0', async () => {
 
-        const blogWithoutLikes = uniqueBlog;
+        const blogWithoutLikes = JSON.parse(JSON.stringify(uniqueBlog));
         delete blogWithoutLikes[0].likes;
 
         const response = await api.post('/api/blogs')
@@ -65,7 +66,7 @@ describe('save new blog', () => {
 
     test('title and url not exist response 400', async () => {
 
-        const blogWithoutTitleAndUrl = uniqueBlog;
+        const blogWithoutTitleAndUrl = JSON.parse(JSON.stringify(uniqueBlog));
         delete blogWithoutTitleAndUrl[0].title;
         delete blogWithoutTitleAndUrl[0].url;
 

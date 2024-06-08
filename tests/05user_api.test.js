@@ -1,5 +1,4 @@
 const app = require('../app');
-
 const mongoose = require('mongoose');
 const { describe, test, after, beforeEach } = require('node:test')
 const assert = require('node:assert');
@@ -24,7 +23,7 @@ test('create a new user', async () => {
 
     const originalUsers = await api.get('/api/users')
 
-    const singleUser = oneUser
+    const singleUser = JSON.parse(JSON.stringify(oneUser));
     
     await api.post('/api/users')
     .send(singleUser[0])
@@ -40,7 +39,7 @@ describe('users create tests', () => {
 
     test('username is required', async () => {
 
-        const singleUser = oneUser
+        const singleUser = JSON.parse(JSON.stringify(oneUser));
         delete singleUser[0].username
 
         await api.post('/api/users')
@@ -51,7 +50,7 @@ describe('users create tests', () => {
 
     test('username not has 3 letters min', async () => {
 
-            const singleUser = oneUser
+            const singleUser = JSON.parse(JSON.stringify(oneUser));
             singleUser[0].username = 'ab'
 
             await api.post('/api/users')
@@ -62,8 +61,7 @@ describe('users create tests', () => {
 
     test('username with 3 letters min', async () => {
 
-        const singleUser = oneUser
-        singleUser[0].username = 'abc'
+        const singleUser = JSON.parse(JSON.stringify(oneUser));
 
         await api.post('/api/users')
         .send(singleUser[0])
@@ -71,9 +69,25 @@ describe('users create tests', () => {
 
     })
 
-    test('password is required', async () => {
+    test('username unique', async () => {
 
-        const singleUser = oneUser
+        const singleUser = JSON.parse(JSON.stringify(oneUser));
+
+        singleUser[0].username = 'notuniquename'
+        
+        await api.post('/api/users')
+        .send(singleUser[0])
+        
+        await api.post('/api/users')
+        .send(singleUser[0])
+        .expect(400)
+
+    })
+
+    test.only('password is required', async () => {
+
+        const singleUser = JSON.parse(JSON.stringify(oneUser));
+        singleUser[0].username = 'passwordrequired'
         delete singleUser[0].password
 
         await api.post('/api/users')
@@ -84,18 +98,20 @@ describe('users create tests', () => {
 
     test('password not has 3 letters min', async () => {
 
-            const singleUser = oneUser
-            singleUser[0].password = 'ab'
+        const singleUser = JSON.parse(JSON.stringify(oneUser));
+        singleUser[0].username = 'password2char'
+        singleUser[0].password = 'ab'
 
-            await api.post('/api/users')
-            .send(singleUser[0])
-            .expect(400)
+        await api.post('/api/users')
+        .send(singleUser[0])
+        .expect(400)
 
     })
 
     test('password with 3 characters min', async () => {
 
-        const singleUser = oneUser
+        const singleUser = JSON.parse(JSON.stringify(oneUser));
+        singleUser[0].username = 'password3char'
         singleUser[0].password = 'abc'
 
         await api.post('/api/users')
