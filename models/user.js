@@ -9,16 +9,17 @@ const userSchema = new mongoose.Schema({
   },
   password: {
       type: String,
-      required: [true, 'Password is required']
+      required: [true, 'Password is required'],
+      minlength: [3, 'Password must be at least 3 characters long']
   },
   name: {
       type: String
   },
   blogs: [
-      {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Blog'
-      }
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Blog'
+    }
   ]
 });
 

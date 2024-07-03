@@ -1,38 +1,60 @@
 const blogRouter = require('express').Router();
 const Blog = require('../models/blog');
+const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const { userExtractor } = require('../utils/middlewares');
 
 blogRouter.get('/', async (request, response) => {
 
-    const blogs = await Blog.find({})
+    const blogs = await Blog.find({}).populate('user', {username: 1, name: 1})
     response.status(200).json(blogs).end()
     
 })
 
-blogRouter.post('/', async (request, response) => {
+blogRouter.get('/:id', async (request, response) => {
+
+  const id = request.params.id
+  const blogs = await Blog.findById(id).populate('user', {username: 1, name: 1})
+  response.status(200).json(blogs).end()
+  
+})
+
+blogRouter.post('/', userExtractor, async (request, response) => {
 
   const body = request.body
 
-  if( !body.title || !body.url ){
+ // Obtaining the user from the token
+ const user = await User.findById(request.user.id)
 
-    response.status(400).end()
+  const blog = new Blog(body)
+  blog.user = user
 
-  }else{
+  user.blogs = user.blogs.concat(blog)
+  await user.save()
 
-    const blog = new Blog(body)
-    const newBlog = await blog.save()
-    response.status(201).json(newBlog) 
-
-  }
-
-
+  const newBlog = await blog.save()
+  response.status(201).json(newBlog)
 
 })
 
-blogRouter.delete('/:id', async (request, response) => {
+blogRouter.delete('/:id',userExtractor, async (request, response) => {
   
     const id = request.params.id
-    await Blog.findByIdAndDelete(id)
-    response.status(204).end()
+    
+    // Obtaining the user from the token
+    const user = await User.findById(request.user.id)
+   
+    const blog = await Blog.findById(id)
+
+    console.log(user.id)
+    console.log(blog.user.toString())
+    
+    if( user === null || user.id !== blog.user.toString() ){
+      return response.status(401).json({ error: 'token invalid' })
+    }else{
+      await Blog.findByIdAndDelete(id)
+      return response.status(204).end()
+    }   
   
 })
 
@@ -42,15 +64,9 @@ blogRouter.put('/:id', async (request, response) => {
   const likes = request.body.likes
   const body = request.body
 
-  if(!likes){
-    response.status(400).end()
-  }
-
-  if( likes ){
-    const updatedBlog = await Blog.findByIdAndUpdate(id, { $inc: { likes: 1 } }, { new: true });
-    response.status(200).json(updatedBlog).end()
-  } 
-
+  const updatedBlog = await Blog.findByIdAndUpdate(id, { $inc: { likes: 1 } }, { new: true });
+  response.status(200).json(updatedBlog).end()
+  
 })
 
 
